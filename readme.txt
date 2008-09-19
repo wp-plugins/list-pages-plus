@@ -1,5 +1,5 @@
 === List Pages Plus ===
-Contributors: skullbit
+Contributors: skullbit, devbit
 Donate link: http://skullbit.com/donate
 Tags: pages, list, wp_list_pages
 Requires at least: 2.5
