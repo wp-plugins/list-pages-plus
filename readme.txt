@@ -4,7 +4,7 @@ Donate link: http://skullbit.com/donate
 Tags: pages, list, wp_list_pages
 Requires at least: 2.5
 Tested up to: 2.6.2
-Stable tag: 1.0
+Stable tag: 1.1
 
 Alter the output of the wp_list_pages() function's HTML.  Set default arguments in Settings Panel using wp_list_pages_plus() replacement function.
 

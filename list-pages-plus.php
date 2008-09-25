@@ -4,8 +4,9 @@ Plugin Name: List Pages Plus
 Plugin URI: http://skullbit.com/wordpress-plugin/list-pages-plus/
 Description: Alter the output of the wp_list_pages() function
 Author: Skullbit.com
-Version: 1.0
+Version: 1.1
 */
+
 load_plugin_textdomain( 'lpplus', '/wp-content/plugins/list-pages-plus' );
 if( !class_exists( 'ListPagesPlus' ) ):
 	class ListPagesPlus {
@@ -100,13 +101,32 @@ if( !class_exists( 'ListPagesPlus' ) ):
 		
 		function SelectPage( $id, $select=false ){
 			global $wpdb;
-			$pages = $wpdb->get_results( "SELECT ID, post_title FROM $wpdb->posts WHERE post_type='page' ORDER BY menu_order, post_title ASC" );
-			$out = "<select name='$id' id='$id' multiple='multiple' size='8' style='height:160px;'>\n";
+			$all = $wpdb->get_results( "SELECT ID FROM $wpdb->posts WHERE post_type='page'" );
+			$total = count( $all );
+			$ht = $total*18;
+			$pages = $wpdb->get_results( "SELECT ID, post_title FROM $wpdb->posts WHERE post_type='page' AND post_parent = 0 ORDER BY post_parent, menu_order, post_title ASC" );
+			$out = "<select name='".$id."[]' id='$id' multiple='multiple' size='8' style='height:".$ht."px;'>\n";
 			if( !is_array($select) ) $select = array($select);
 			foreach( $pages as $pg ):
 				$out .= "\t<option value='".$pg->ID."'";
 				if( in_array($pg->ID, $select) ) $out .= " selected='selected'";
 				$out .= ">".$pg->post_title."</option>\n";
+				$kids = $wpdb->get_results( "SELECT ID, post_title FROM $wpdb->posts WHERE post_type='page' AND post_parent = $pg->ID ORDER BY menu_order, post_title ASC" );
+				if( $kids ):
+				foreach( $kids as $kid ):
+					$out .= "\t<option value='".$kid->ID."'";
+					if( in_array($kid->ID, $select) ) $out .= " selected='selected'";
+					$out .= "> - ".$kid->post_title."</option>\n";
+					$subkids = $wpdb->get_results( "SELECT ID, post_title FROM $wpdb->posts WHERE post_type='page' AND post_parent = $kid->ID ORDER BY menu_order, post_title ASC" );
+					if( $subkids ):
+					foreach( $subkids as $sk ):
+						$out .= "\t<option value='".$sk->ID."'";
+						if( in_array($sk->ID, $select) ) $out .= " selected='selected'";
+						$out .= "> -- ".$sk->post_title."</option>\n";
+					endforeach;
+					endif;
+				endforeach;
+				endif;
 			endforeach;
 			$out .= "</select>";
 			echo $out;
