@@ -3,8 +3,8 @@
 Plugin Name: List Pages Plus
 Plugin URI: http://skullbit.com/wordpress-plugin/list-pages-plus/
 Description: Alter the output of the wp_list_pages() function
-Author: Skullbit.com
-Version: 1.1
+Author: devbits
+Version: 1.2
 */
 
 load_plugin_textdomain( 'lpplus', '/wp-content/plugins/list-pages-plus' );
@@ -221,22 +221,28 @@ function wp_list_pages_plus($args=''){
 	$enhanced = get_option('list_pages_plus');
  
 	$defaults = array(
-		'depth' => $enhanced['depth'], 'show_date' => '',
+		'depth' => $enhanced['depth'], 
+		'show_date' => '',
 		'date_format' => get_option('date_format'),
-		'child_of' => 0, 'exclude' => $enhanced['exclude'],
-		'title_li' => $enhanced['title_li'], 'echo' => 1,
-		'authors' => '', 'sort_column' => $enhanced['sort_column'], 
+		'child_of' => 0, 
+		'exclude' => $enhanced['exclude'],
+		'title_li' => $enhanced['title_li'], 
+		'echo' => 1,
+		'authors' => '', 
+		'sort_column' => $enhanced['sort_column'], 
 		'sort_order' => $enhanced['sort_order']
 	);
 	$r = wp_parse_args( $args, $defaults );
 	extract( $r, EXTR_SKIP );
 	
+	if( $r['exclude'] ) $exclude = '&exclude='.implode(',',$r['exclude']);
+	
 	if( $r['include'] )
 		$include = '&include='.$r['include'];
 	
 	if( $r['echo'] == 1 )
-		wp_list_pages('title_li='.$r['title_li'].'&sort_column='.$r['sort_column'].'&sort_order='.$r['sort_order'].'&exclude='.$r['exclude'].'&include='.$r['include'].'&depth='.$r['depth'].'&echo='.$r['echo'].'&show_date='.$r['show_date'].'&date_format='.$r['date_format'].'&authors='.$r['authors'].$include);	
+		wp_list_pages('title_li='.$r['title_li'].'&sort_column='.$r['sort_column'].'&sort_order='.$r['sort_order'].$exclude.'&include='.$r['include'].'&depth='.$r['depth'].'&echo='.$r['echo'].'&show_date='.$r['show_date'].'&date_format='.$r['date_format'].'&authors='.$r['authors'].$include);	
 	else 
-		return wp_list_pages('title_li='.$r['title_li'].'&sort_column='.$r['sort_column'].'&sort_order='.$r['sort_order'].'&exclude='.$r['exclude'].'&depth='.$r['depth'].'&echo='.$r['echo'].'&show_date='.$r['show_date'].'&date_format='.$r['date_format'].'&authors='.$r['authors'].$include);
+		return wp_list_pages('title_li='.$r['title_li'].'&sort_column='.$r['sort_column'].'&sort_order='.$r['sort_order'].$exclude.'&depth='.$r['depth'].'&echo='.$r['echo'].'&show_date='.$r['show_date'].'&date_format='.$r['date_format'].'&authors='.$r['authors'].$include);
 }
 ?>
