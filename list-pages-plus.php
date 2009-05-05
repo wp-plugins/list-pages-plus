@@ -2,9 +2,9 @@
 /*
 Plugin Name: List Pages Plus
 Plugin URI: http://skullbit.com/wordpress-plugin/list-pages-plus/
-Description: Alter the output of the wp_list_pages() function
+Description: Alter the output of the wp_list_pages() function with ease
 Author: devbits
-Version: 1.2
+Version: 1.3
 */
 
 load_plugin_textdomain( 'lpplus', '/wp-content/plugins/list-pages-plus' );
@@ -26,13 +26,20 @@ if( !class_exists( 'ListPagesPlus' ) ):
 			$update = get_option( 'list_pages_plus' );
 			$update['sort_column'] = $_POST['sort_column'];
 			$update['sort_order'] = $_POST['sort_order'];
+			$update['excinc'] = $_POST['excinc'];
 			$update['exclude'] = $_POST['exclude'];
 			$update['depth'] = $_POST['depth'];
+			if( !isset($_POST['null_parent']) ) $_POST['null_parent'] = 0;
+			$update['null_parent'] = $_POST['null_parent'];
+			if( !isset($_POST['null_subparent']) ) $_POST['null_subparent'] = 0;
+			$update['null_subparent'] = $_POST['null_subparent'];
 			$update["class"] = $_POST['class'];
+			$update["aclass"] = $_POST['aclass'];
 			$update["title_li"] = $_POST['title_li'];
 			$update["pre"] = $_POST['pre'];
 			$update["post"] = $_POST['post'];
 			$update["subclass"] = $_POST['subclass'];
+			$update["subaclass"] = $_POST['subaclass'];
 			$update["subtitle"] = $_POST['subtitle'];
 			$update["subpre"] = $_POST['subpre'];
 			$update["subpost"] = $_POST['subpost'];
@@ -44,14 +51,19 @@ if( !class_exists( 'ListPagesPlus' ) ):
 			$enhanced = get_option('list_pages_plus');
 			$sort_column = $enhanced['sort_column'];
 			$sort_order = $enhanced['sort_order'];
+			$excinc = $enhanced['excinc'];
 			$exclude = $enhanced['exclude'];
 			$depth = $enhanced['depth'];
+			$null_parent = $enhanced['null_parent'];
+			$null_subparent = $enhanced['null_subparent'];
 			$title_li = $enhanced['title_li'];
 			$ac = $enhanced['class'];
+			$aac = $enhanced['aclass'];
 			$at = $enhanced['title'];
 			$pre = $enhanced['pre'];
 			$post = $enhanced['post'];
 			$sac = $enhanced['subclass'];
+			$saac = $enhanced['subaclass'];
 			$sat = $enhanced['subtitle'];
 			$spre = $enhanced['subpre'];
 			$spost = $enhanced['subpost'];
@@ -63,12 +75,13 @@ if( !class_exists( 'ListPagesPlus' ) ):
                 <p><?php _e('Enhance your Page List menu by making additions to the default classes, title, and tags surrounding the Page Title for both Parent and Child pages.', 'lpplus');?></p>
              <form method="post" action=""> 
              <?php if( function_exists( 'wp_nonce_field' )) wp_nonce_field( 'lpplus-update-options'); ?>
-             	<p><code>&lt;li class="&hellip;<input type="text" name="class" value="<?php echo $ac;?>" style="width:50px;font-size:0.8em;" />">&lt;a href="&hellip;" title="<?php _e('Page Title', 'lpplus');?><input type="text" name="title" value="<?php echo $at;?>" style="width:50px;font-size:0.8em;" />"><input type="text" name="pre" value="<?php echo $pre;?>" style="width:50px;font-size:0.8em;" /><?php _e('Parent Page Title', 'lpplus');?><input type="text" name="post" value="<?php echo $post;?>" style="width:50px;font-size:0.8em;" />&lt;/a>&lt;/li></code></p>
-                <p><code>&lt;li class="&hellip;<input type="text" name="subclass" value="<?php echo $sac;?>" style="width:50px;font-size:0.8em;" />">&lt;a href="&hellip;" title="<?php _e('Page Title', 'lpplus');?><input type="text" name="subtitle" value="<?php echo $sat;?>" style="width:50px;font-size:0.8em;" />"><input type="text" name="subpre" value="<?php echo $spre;?>" style="width:50px;font-size:0.8em;" /><?php _e('Child Page Title', 'lpplus');?><input type="text" name="subpost" value="<?php echo $spost;?>" style="width:50px;font-size:0.8em;" />&lt;/a>&lt;/li></code></p>
+             	<p><code>&lt;li class="&hellip;<input type="text" name="class" value="<?php echo $ac;?>" style="width:50px;font-size:0.8em;" />">&lt;a class="<input type="text" name="aclass" value="<?php echo $aac;?>" style="width:50px;font-size:0.8em;" />" href="&hellip;" title="<?php _e('Page Title', 'lpplus');?><input type="text" name="title" value="<?php echo $at;?>" style="width:50px;font-size:0.8em;" />"><input type="text" name="pre" value="<?php echo $pre;?>" style="width:50px;font-size:0.8em;" /><?php _e('Parent Page Title', 'lpplus');?><input type="text" name="post" value="<?php echo $post;?>" style="width:50px;font-size:0.8em;" />&lt;/a>&lt;/li></code></p>
+                <p><code>&lt;li class="&hellip;<input type="text" name="subclass" value="<?php echo $sac;?>" style="width:50px;font-size:0.8em;" />">&lt;a class="<input type="text" name="subaclass" value="<?php echo $saac;?>" style="width:50px;font-size:0.8em;" />" href="&hellip;" title="<?php _e('Page Title', 'lpplus');?><input type="text" name="subtitle" value="<?php echo $sat;?>" style="width:50px;font-size:0.8em;" />"><input type="text" name="subpre" value="<?php echo $spre;?>" style="width:50px;font-size:0.8em;" /><?php _e('Child Page Title', 'lpplus');?><input type="text" name="subpost" value="<?php echo $spost;?>" style="width:50px;font-size:0.8em;" />&lt;/a>&lt;/li></code></p>
                 <h3><?php _e('Override Arguments', 'lpplus');?></h3>
                 <p><?php _e('You can replace your <code>wp_list_pages();</code> function with <code>wp_list_pages_plus();</code> and set the default arguments here.  You can also override these arguments using the same inline arguments as', 'lpplus');?> <a href="http://codex.wordpress.org/Template_Tags/wp_list_pages">wp_list_pages()</a> <?php _e('in your template files', 'lpplus');?>.
                 <table class="form-table"> 
-                	<tr> 
+                	
+                    <tr> 
                 		<th scope="row"><label for="title_li"><?php _e('Title', 'lpplus');?></label></th> 
                 		<td><input type="text" name="title_li" id="title_li" value="<?php echo $title_li;?>" /></td> 
                 	</tr> 
@@ -81,14 +94,22 @@ if( !class_exists( 'ListPagesPlus' ) ):
                 		<td><?php $this->SelectList( array('asc', 'desc'), 'sort_order', $sort_order);?></td> 
                 	</tr> 
                     <tr> 
-                		<th scope="row"><label for="exclude"><?php _e('Exclude', 'lpplus');?></label></th> 
-                		<td><?php $this->SelectPage( 'exclude', $exclude);?></td> 
+                		<th scope="row"><label for="exclude"><select name="excinc"><option value="exclude" <?php if($excinc == 'exclude') echo 'selected="selected"';?>><?php _e('Exclude', 'lpplus');?></option><option value="include" <?php if($excinc == 'include') echo 'selected="selected"';?>><?php _e('Include', 'lpplus');?></option></select></label></th> 
+                		<td><?php $this->SelectPage( 'exclude', $exclude);?><br /><small><?php _e('Exclude will hide selected pages from your menu.  Include will only show selected pages on your menu','lpplus');?></small></td> 
                 	</tr> 
                    
                     <tr> 
                 		<th scope="row"><label for="depth"><?php _e('Depth', 'lpplus');?></label></th> 
-                		<td><?php $this->SelectList( array('0|Pages & sub-pages displayerd in a hierarchical (indented) form', '-1|Pages & sub-pages displayed in flat (no indent) form', '1|Show only top level Pages', '2|Decend to 2nd level of Pages only', '3|Decend to 3rd level of Pages only'), 'depth', $include);?></td> 
+                		<td><?php $this->SelectList( array('0|Pages & sub-pages displayed in a hierarchical (indented) form', '-1|Pages & sub-pages displayed in flat (no indent) form', '1|Show only top level Pages', '2|Decend to 2nd level of Pages only', '3|Decend to 3rd level of Pages only'), 'depth', $include);?></td> 
                 	</tr> 
+                    <tr> 
+                		<th scope="row"><label for="null_parent"><?php _e('No Parent Links', 'lpplus');?></label></th> 
+                		<td><input type="checkbox" name="null_parent" id="null_parent" value="1" <?php if ($null_parent == 1) echo 'checked="checked"';?> /> <small><?php _e('If checked top-level parent pages will not have a link - pages without children will still link', 'lpplus');?></small></td> 
+                	</tr>
+                    <tr> 
+                		<th scope="row"><label for="null_subparent"><?php _e('No Sub-Parent Links', 'lpplus');?></label></th> 
+                		<td><input type="checkbox" name="null_subparent" id="null_subparent" value="1" <?php if ($null_subparent == 1) echo 'checked="checked"';?> /> <small><?php _e('If checked all levels of parent pages will not have a link - pages without children will still link', 'lpplus');?></small></td> 
+                	</tr>
                  </table>
              
                 
@@ -149,52 +170,80 @@ if( !class_exists( 'ListPagesPlus' ) ):
 		function ApplyEnhancements($pages){
 			$enhanced = get_option('list_pages_plus');
 			$ac = ' '.$enhanced['class'];
+			$aac = ' class="'.$enhanced['aclass'].'"';
 			$at = $enhanced['title'];
 			$pre = $enhanced['pre'];
 			$post = $enhanced['post'];
 			$sac = ' '.$enhanced['subclass'];
+			$saac = ' class="'.$enhanced['subaclass'].'"';
 			$sat = $enhanced['subtitle'];
 			$spre = $enhanced['subpre'];
 			$spost = $enhanced['subpost'];
 			
+			$null_parent = $enhanced['null_parent'];
+			$null_subparent = $enhanced['null_subparent'];
+			
 			//put each li in an array
 			$litem = explode('</li>', $pages);
-			
+			//echo '<pre>'; print_r($litem);echo '</pre>';
 			//print_r($litem);
 			
 			foreach( $litem as $k=>$li ):
 				//check for ul and seperate
-				if( strpos( $li, '<ul>' ) ):
+				
+				if( strpos( $li, '<ul>' ) ): //PARENT PAGE
 					$lis = explode( '<ul>', $li );
 					$class1 = $this->GetValue( 'class="', '"', $lis[0] );
 					$href1 = $this->GetValue( 'href="', '"', $lis[0] );
 					$title1 = $this->GetValue( 'title="', '"', $lis[0] );
 					$text1 = $this->GetValue( $title1.'">', '</a>', $lis[0] );
-					$class2 = $this->GetValue( 'class="', '"', $lis[1] );
-					$href2 = $this->GetValue( 'href="', '"', $lis[1] );
-					$title2 = $this->GetValue( 'title="', '"', $lis[1] );
-					$text2 = $this->GetValue( $title2.'">', '</a>', $lis[1] );
+					if( $lis[1] ){
+						$class2 = $this->GetValue( 'class="', '"', $lis[1] );
+						$href2 = $this->GetValue( 'href="', '"', $lis[1] );
+						$title2 = $this->GetValue( 'title="', '"', $lis[1] );
+						$text2 = $this->GetValue( $title2.'">', '</a>', $lis[1] );
+						if( $lis[2] && $null_subparent ){ $subnull2 =  'onclick="return false;"';}
+						$li2 = "\n\t <ul> \n\t" .'<li class="'.$class2.$sac.' p2"><a href="'.$href2.$sah.'"'.$subnull2.' title="'.$title2.$sat.'">'.$spre.$text2.$spost.'</a>';
+						$issub = 1;
+					}
+					if( $lis[2] ){
+						$class3 = $this->GetValue( 'class="', '"', $lis[2] );
+						$href3 = $this->GetValue( 'href="', '"', $lis[2] );
+						$title3 = $this->GetValue( 'title="', '"', $lis[2] );
+						$text3 = $this->GetValue( $title3.'">', '</a>', $lis[2] );
+						if( $lis[3] && $null_subparent ){ $subnull3 =  'onclick="return false;"';}
+						$li3 = "\n\t <ul> \n\t" .'<li class="'.$class3.$sac.' p3"><a href="'.$href3.$sah.'"'.$subnull3.' title="'.$title3.$sat.'">'.$spre.$text3.$spost.'</a>';
+						$issub = 1;
+					}
+					if( $lis[3] ){
+						$class4 = $this->GetValue( 'class="', '"', $lis[3] );
+						$href4 = $this->GetValue( 'href="', '"', $lis[3] );
+						$title4 = $this->GetValue( 'title="', '"', $lis[3] );
+						$text4 = $this->GetValue( $title4.'">', '</a>', $lis[3] );
+						$li4 = "\n\t <ul> \n\t" .'<li class="'.$class4.$sac.' p4"><a href="'.$href4.$sah.'" title="'.$title4.$sat.'">'.$spre.$text4.$spost.'</a>';
+					}
 					
-					$litem[$k] = "\n\t" . '<li class="'.$class1.$ac.'"><a href="'.$href1.'" title="'.$title1.$at.'">'.$pre.$text1.$post.'</a>'. "\n\t <ul> \n\t" .'<li class="'.$class2.$sac.'"><a href="'.$href2.$sah.'" title="'.$title2.$sat.'">'.$spre.$text2.$spost.'</a>';
-					$issub = 1;
-				elseif( strpos( $li, '</ul>' ) ):
+					if( $null_parent ){ $null =  'onclick="return false;"';}
+					$litem[$k] = "\n\t" . '<li class="'.$class1.$ac.' p1"><a href="'.$href1.'"'.$null.' title="'.$title1.$at.'">'.$pre.$text1.$post.'</a>'.$li2.$li3.$li4;
+					
+					 
+				elseif( strpos( $li, '</ul>' ) ): //END OF LIST
 					$issub = false;
-				elseif( strpos( $li, 'li') ):
+					
+				elseif( strpos( $li, 'li') ): //CHILD PAGE
 					$class = $this->GetValue( 'class="', '"', $li );
 					$href = $this->GetValue( 'href="', '"', $li );
 					$title = $this->GetValue( 'title="', '"', $li );
 					$text = $this->GetValue( $title.'">', '</a>', $li );
-					
-					
-					//put back together
+
+					//NEED MORE LEVELS!
 					
 					if( $issub ):		
-						$litem[$k] = "\n\t" . '<li class="'.$class.$sac.'"><a href="'.$href.'" title="'.$title.$sat.'">'.$spre.$text.$spost.'</a>'.$end;
+						$litem[$k] = "\n\t" . '<li class="'.$class.$sac.' sub"><a '.$saac.' href="'.$href.'" title="'.$title.$sat.'">'.$spre.$text.$spost.'</a>'.$end;
 					else:
-						$litem[$k] = "\n\t" . '<li class="'.$class.$ac.'"><a href="'.$href.'" title="'.$title.$at.'">'.$pre.$text.$post.'</a>';
+						$litem[$k] = "\n\t" . '<li class="'.$class.$ac.' other"><a '.$aac.' href="'.$href.'" title="'.$title.$at.'">'.$pre.$text.$post.'</a>';	
 					endif;
-					
-					
+										
 				endif;
 				
 			endforeach;
@@ -219,13 +268,14 @@ if( class_exists( 'ListPagesPlus' ) )
 function wp_list_pages_plus($args=''){
 	global $lpe;
 	$enhanced = get_option('list_pages_plus');
- 
+ 	if( $enhanced['excinc'] == 'exclude' ) $ex = $enhanced['exclude']; else $in = $enhanced['exclude'];
 	$defaults = array(
 		'depth' => $enhanced['depth'], 
 		'show_date' => '',
 		'date_format' => get_option('date_format'),
 		'child_of' => 0, 
-		'exclude' => $enhanced['exclude'],
+		'exclude' => implode(',',$ex),
+		'include' => implode(',',$in),
 		'title_li' => $enhanced['title_li'], 
 		'echo' => 1,
 		'authors' => '', 
@@ -235,7 +285,8 @@ function wp_list_pages_plus($args=''){
 	$r = wp_parse_args( $args, $defaults );
 	extract( $r, EXTR_SKIP );
 	
-	if( $r['exclude'] ) $exclude = '&exclude='.implode(',',$r['exclude']);
+	if( $r['exclude'] ) 
+		$exclude = '&exclude='.$r['exclude'];
 	
 	if( $r['include'] )
 		$include = '&include='.$r['include'];
