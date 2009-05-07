@@ -4,7 +4,7 @@ Plugin Name: List Pages Plus
 Plugin URI: http://skullbit.com/wordpress-plugin/list-pages-plus/
 Description: Alter the output of the wp_list_pages() function with ease
 Author: devbits
-Version: 1.3
+Version: 1.4
 */
 
 load_plugin_textdomain( 'lpplus', '/wp-content/plugins/list-pages-plus' );
@@ -268,14 +268,14 @@ if( class_exists( 'ListPagesPlus' ) )
 function wp_list_pages_plus($args=''){
 	global $lpe;
 	$enhanced = get_option('list_pages_plus');
- 	if( $enhanced['excinc'] == 'exclude' ) $ex = $enhanced['exclude']; else $in = $enhanced['exclude'];
+ 	if( $enhanced['excinc'] == 'exclude' ) $ex = implode(',',$enhanced['exclude']); else $in = implode(',',$enhanced['exclude']);
 	$defaults = array(
 		'depth' => $enhanced['depth'], 
 		'show_date' => '',
 		'date_format' => get_option('date_format'),
 		'child_of' => 0, 
-		'exclude' => implode(',',$ex),
-		'include' => implode(',',$in),
+		'exclude' => $ex,
+		'include' => $in,
 		'title_li' => $enhanced['title_li'], 
 		'echo' => 1,
 		'authors' => '', 
