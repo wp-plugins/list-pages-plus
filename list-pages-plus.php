@@ -4,7 +4,7 @@ Plugin Name: List Pages Plus
 Plugin URI: http://skullbit.com/wordpress-plugin/list-pages-plus/
 Description: Alter the output of the wp_list_pages() function with ease
 Author: devbits
-Version: 1.4
+Version: 1.5
 */
 
 load_plugin_textdomain( 'lpplus', '/wp-content/plugins/list-pages-plus' );
@@ -18,7 +18,7 @@ if( !class_exists( 'ListPagesPlus' ) ):
 		}
 		
 		function AddPanel(){
-			add_options_page( __('List Pages Plus', 'lpplus'), __('List Pages Plus', 'lpplus'), 10, 'list-pages-plus', array($this, 'Panel'));
+			add_pages_page( __('List Pages Plus', 'lpplus'), __('List Pages Plus', 'lpplus'), 7, 'list-pages-plus', array($this, 'Panel'));
 		}
 		
 		function SaveSettings(){
@@ -197,6 +197,9 @@ if( !class_exists( 'ListPagesPlus' ) ):
 					$href1 = $this->GetValue( 'href="', '"', $lis[0] );
 					$title1 = $this->GetValue( 'title="', '"', $lis[0] );
 					$text1 = $this->GetValue( $title1.'">', '</a>', $lis[0] );
+					$li2 = false;
+					$li3 = false;
+					$li4 = false;
 					if( $lis[1] ){
 						$class2 = $this->GetValue( 'class="', '"', $lis[1] );
 						$href2 = $this->GetValue( 'href="', '"', $lis[1] );
@@ -259,6 +262,7 @@ if( !class_exists( 'ListPagesPlus' ) ):
 			$output = $output[0];
 			return $output;
 		}
+		
 	}
 endif;
 
@@ -286,8 +290,8 @@ function wp_list_pages_plus($args=''){
 	extract( $r, EXTR_SKIP );
 	
 	if( $r['exclude'] ) 
-		$exclude = '&exclude='.$r['exclude'];
-	
+		$exclude = '&exclude='.$r['exclude'].$hide;
+
 	if( $r['include'] )
 		$include = '&include='.$r['include'];
 	
